@@ -163,6 +163,11 @@ func (s *Service) Close() error {
 
 func (s *Service) RegisterTools(server *mcp.Server) {
 	mcp.AddTool(server, &mcp.Tool{
+		Name:        "telegram_notify",
+		Description: "Send a plain-text Telegram message (1-4096 characters) to the configured chat only. Requires TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID, or the DSH_TELEGRAM aliases.",
+	}, s.telegramNotify)
+
+	mcp.AddTool(server, &mcp.Tool{
 		Name:        "send_general_sms",
 		Description: "Send an SMS from the general-purpose Twilio number to a US or Puerto Rico number.",
 	}, s.sendGeneralSMS)

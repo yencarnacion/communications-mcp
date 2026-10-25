@@ -44,10 +44,14 @@ type Config struct {
 	NTFYTopic    string
 	NTFYUsername string
 	NTFYPassword string
+
+	TelegramBotToken string
+	TelegramChatID   string
 }
 
 func Load() (Config, error) {
 	_ = godotenv.Load()
+	telegramToken, telegramChatID := telegramCredentials()
 
 	cfg := Config{
 		BindAddress: strings.TrimSpace(getEnv("MCP_BIND_ADDRESS", defaultBindAddress)),
@@ -72,6 +76,9 @@ func Load() (Config, error) {
 		NTFYTopic:    strings.TrimSpace(getEnv("NTFY_TOPIC", defaultNTFYTopic)),
 		NTFYUsername: strings.TrimSpace(os.Getenv("NTFY_USERNAME")),
 		NTFYPassword: strings.TrimSpace(os.Getenv("NTFY_PASSWORD")),
+
+		TelegramBotToken: telegramToken,
+		TelegramChatID:   telegramChatID,
 	}
 
 	if cfg.BindAddress == "" {
@@ -102,6 +109,17 @@ func Load() (Config, error) {
 	}
 
 	return cfg, nil
+}
+
+// Prefer the TELEGRAM pair when either variable is configured; never combine
+// credentials from two different bots/chats. The DSH pair is a compatibility alias.
+func telegramCredentials() (string, string) {
+	token := strings.TrimSpace(os.Getenv("TELEGRAM_BOT_TOKEN"))
+	chatID := strings.TrimSpace(os.Getenv("TELEGRAM_CHAT_ID"))
+	if token != "" || chatID != "" {
+		return token, chatID
+	}
+	return strings.TrimSpace(os.Getenv("DSH_TELEGRAM_BOT_TOKEN")), strings.TrimSpace(os.Getenv("DSH_TELEGRAM_CHAT_ID"))
 }
 
 func getEnv(key, fallback string) string {

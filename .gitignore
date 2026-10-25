@@ -1,4 +1,6 @@
 .env
+.env.*
+!.env.example
+*.env
 communications-mcp
 .codex
-go.sum
